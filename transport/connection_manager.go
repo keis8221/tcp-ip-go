@@ -39,7 +39,7 @@ type ConnectionManager struct {
 
 func NewConnectionManager() *ConnectionManager {
 	return &ConnectionManager{
-		Connection:            make([]Connection, 0),
+		Connections:           make([]Connection, 0),
 		AcceptConnectionQueue: make(chan Connection, QUEUE_SIZE),
 	}
 }
@@ -93,6 +93,12 @@ func (m *ConnectionManager) recv(queue *TcpPacketQueue, pkt TcpPacket) {
 		}, nil)
 		m.update(pkt, StateLastAck, false)
 	}
+
+	if ok && pkt.TcpHeader.Flags.ACK && conn.State == StateLastAck {
+		log.Printf("Received ACK Packet")
+		m.update(pkt, StateClosed, false)
+		m.remove(pkt)
+	}
 }
 
 func (m *ConnectionManager) addConnection(pkt TcpPacket) Connection {
@@ -118,6 +124,26 @@ func (m *ConnectionManager) addConnection(pkt TcpPacket) Connection {
 func (m *ConnectionManager) remove(pkt TcpPacket) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
+
+	for i, conn := range m.Connections {
+		if conn.SrcPort == pkt.TcpHeader.SrcPort && conn.DstPort == pkt.TcpHeader.DstPort {
+			m.Connections = append(m.Connections[:i], m.Connections[i+1:]...)
+			return
+		}
+	}
+}
+
+func (m *ConnectionManager) find(pkt TcpPacket) (Connection, bool) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	for _, conn := range m.Connections {
+		if conn.SrcPort == pkt.TcpHeader.SrcPort && conn.DstPort == pkt.TcpHeader.DstPort {
+			return conn, true
+		}
+	}
+
+	return Connection{}, false
 }
 
 func (m *ConnectionManager) update(pkt TcpPacket, state State, isAccept bool) {
@@ -132,7 +158,15 @@ func (m *ConnectionManager) update(pkt TcpPacket, state State, isAccept bool) {
 		}
 	}
 }
-func find() {
+
+func (m *ConnectionManager) updateIncrementSeqNum(pkt TcpPacket, val uint32) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
+
+	for i, conn := range m.Connections {
+		if conn.SrcPort == pkt.TcpHeader.SrcPort && conn.DstPort == pkt.TcpHeader.DstPort {
+			m.Connections[i].incrementSeqNum += val
+			return
+		}
+	}
 }

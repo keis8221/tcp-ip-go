@@ -44,7 +44,7 @@ func (tcp *TcpPacketQueue) ManageQueues(ip *internet.IpPacketQueue) {
 			default:
 				ipPkt, err := ip.Read()
 				if err != nil {
-					log.Print("read error: %s", err.Error())
+					log.Printf("read error: %s", err.Error())
 				}
 				tcpHeader, err := unmarshal(ipPkt.Packet.Buf[ipPkt.IpHeader.IHL*4 : ipPkt.Packet.N])
 				if err != nil {
@@ -67,7 +67,7 @@ func (tcp *TcpPacketQueue) ManageQueues(ip *internet.IpPacketQueue) {
 			select {
 			case <-tcp.ctx.Done():
 				return
-			case pkt := tcp.outgoingQueue:
+			case pkt := <-tcp.outgoingQueue:
 				err := ip.Write(pkt)
 				if err != nil {
 					log.Printf("write error: %s", err.Error())
@@ -95,7 +95,7 @@ func (tcp *TcpPacketQueue) Write(conn Connection, flgs HeaderFlags, data []byte)
 
 	seqNum := conn.initialSeqNum + conn.incrementSeqNum
 
-	writeIpHdr := internet.NewIp(pkt.IpHeaeder.DstIP, pkt.IpHeader.SrcIP, LENGTH+len(data))
+	writeIpHdr := internet.NewIp(pkt.IpHeader.DstIP, pkt.IpHeader.SrcIP, LENGTH+len(data))
 	writeTcpHdr := New(
 		pkt.TcpHeader.DstPort,
 		pkt.TcpHeader.SrcPort,

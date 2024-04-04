@@ -73,8 +73,8 @@ func (h *Header) Marshal(ipHdr *internet.Header, data []byte) []byte {
 	pkt := make([]byte, 20)
 	binary.BigEndian.PutUint16(pkt[0:2], h.SrcPort)
 	binary.BigEndian.PutUint16(pkt[2:4], h.DstPort)
-	binary.BigEndian.PutUint32(pkt[4:6], h.SeqNum)
-	binary.BigEndian.PutUint32(pkt[6:12], h.AckNum)
+	binary.BigEndian.PutUint32(pkt[4:8], h.SeqNum)
+	binary.BigEndian.PutUint32(pkt[8:12], h.AckNum)
 	pkt[12] = h.DataOff
 	pkt[13] = f
 	binary.BigEndian.PutUint16(pkt[14:16], h.WindowSize)

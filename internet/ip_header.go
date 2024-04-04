@@ -54,6 +54,22 @@ func unmarshal(pkt []byte) (*Header, error) {
 	return header, nil
 }
 
+func NewIp(srcIP, dstIP [4]byte, len int) *Header {
+	return &Header{
+		Version:     IP_VERSION,
+		IHL:         IHL,
+		TOS:         TOS,
+		TotalLength: uint16(LENGTH + len),
+		ID:          0,
+		Flags:       0x40,
+		TTL:         64,
+		Protocol:    TCP_PROTOCOL,
+		Checksum:    0,
+		SrcIP:       srcIP,
+		DstIP:       dstIP,
+	}
+}
+
 func (h *Header) Marshal() []byte {
 	versionAndIHL := (h.Version << 4) | h.IHL
 	flagsAndFragmentOffset := (uint16(h.FlagmentOffset) << 13) | (h.FlagmentOffset & 0x1FFF)
