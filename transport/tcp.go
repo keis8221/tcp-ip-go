@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kawa1214/tcp-ip-go/internet"
-	"github.com/kawa1214/tcp-ip-go/network"
+	"github.com/keis8221/tcp-ip-go/internet"
+	"github.com/keis8221/tcp-ip-go/network"
 )
 
 const (
@@ -113,6 +113,13 @@ func (tcp *TcpPacketQueue) Write(conn Connection, flgs HeaderFlags, data []byte)
 	incrementSeqNum := 0
 	if flgs.SYN || flgs.FIN {
 		incrementSeqNum += 1
+	}
+	incrementSeqNum += len(data)
+	tcp.manager.updateIncrementSeqNum(pkt, uint32(incrementSeqNum))
+
+	tcp.outgoingQueue <- network.Packet{
+		Buf: writePkt,
+		N:   uintptr(len(writePkt)),
 	}
 }
 

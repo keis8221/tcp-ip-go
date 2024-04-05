@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kawa1214/tcp-ip-go/network"
+	"github.com/keis8221/tcp-ip-go/network"
 )
 
 func main() {

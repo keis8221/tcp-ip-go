@@ -57,6 +57,16 @@ func NewTun() (*NetDevice, error) {
 	}, nil
 }
 
+func (t *NetDevice) Close() error {
+	err := t.file.Close()
+	if err != nil {
+		return fmt.Errorf("close error: %s", err.Error())
+	}
+	t.cancel()
+
+	return nil
+}
+
 func (t *NetDevice) read(buf []byte) (uintptr, error) {
 	n, _, sysErr := syscall.Syscall(syscall.SYS_READ, t.file.Fd(), uintptr(unsafe.Pointer(&buf[0])), uintptr(len(buf)))
 	if sysErr != 0 {

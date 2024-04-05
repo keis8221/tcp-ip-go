@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/kawa1214/tcp-ip-go/internet"
-	"github.com/kawa1214/tcp-ip-go/network"
-	"github.com/kawa1214/tcp-ip-go/transport"
+	"github.com/keis8221/tcp-ip-go/internet"
+	"github.com/keis8221/tcp-ip-go/network"
+	"github.com/keis8221/tcp-ip-go/transport"
 )
 
 func main() {

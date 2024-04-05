@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/kawa1214/tcp-ip-go/internet"
+	"github.com/keis8221/tcp-ip-go/internet"
 )
 
 const (
